@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Meine Website</title>
+</head>
+<body>
+    <!--Überschriften-->
+    <h1 id="top">Überschrift h1</h1>
+    <h2>Überschrift h2</h2>
+    <h3>Überschrift h3</h3>
+    <h4>Überschrift h4</h4>
+    <h5>Überschrift h5</h5>
+    <h6>Überschrift h6</h6>
+
+    <!--Absätze-->
+    <p>
+    Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+    </p>
+    <hr>
+    <p>
+    Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+    </p>
+    <hr>
+    <!--Textformatierung-->
+    <b>Fetter Text</b>
+    <i>kursiver Text</i>
+    <u>unterstrichenen Text</u>
+    <br>
+    <hr>
+    <!--Links-->
+    <a href="http://google.de" target="_blank">Google</a>
+    <br>
+    <a href="#top">nach oben</a>
+    <hr>
+    <!--Listen-->
+    <ul>
+        <li>Rot</li>
+        <li>Grün</li>
+        <li>Blau</li>
+        <ol>
+            <li>halt</li>
+            <li>stop</li>
+        </ol>
+    </ul>
+    <hr>
+    <!--Buttons-->
+    <button>Drück mich</button>
+    <hr>
+    <!--Bilder-->
+    <img alt="alternativer Text"
+         src="https://images.unsplash.com/photo-1604854657221-42873468254c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=435&q=80"
+         width="200">
+    <br>
+    <hr>
+    <!--Tabellen-->
+    <table border="1" width="100%" cellpadding="10" cellspacing="10">
+        <tr>
+            <td>Max</td>
+            <td>Mustermann</td>
+        </tr>
+        <tr>
+            <td>Emil</td>
+            <td>Kaufmann</td>
+        </tr>
+        <tr>
+            <td colspan="2">August Lustig</td>
+        </tr>
+        <tr>
+            <td rowspan="2">Mario</td>
+            <td>Müller</td>
+        </tr>
+        <tr>
+            <td>Maier</td>
+        </tr>
+    </table>
+    <hr>
+    <!--Formulare-->
+    <form action="">
+        <div>
+            <label for="fn">Vorname</label>
+            <input type="text" name="first_name" id="fn" placeholder="Gib den Vornamen an">
+        </div>
+        <div>
+            <label for="ln">Nachname</label>
+            <input type="text" name="last_name" id="ln" placeholder="Gib den Nachnamen an">
+        </div>
+        <div>
+            <label for="em">Email</label>
+            <input type="email" name="email" id="em" placeholder="Gib die Email-Adresse an">
+        </div>
+        <div>
+            <label for="pw">Passwort</label>
+            <input type="password" name="password" id="pw" placeholder="Gib Passwort an">
+        </div>
+        <div>
+            <label for="s1">Wähle eine Option</label>
+            <select name="auswahl" id="s1">
+                <option value="1">Ja</option>
+                <option value="0">Nein</option>
+            </select>
+        </div>
+        <div>
+            <label for="ch1">AGB zustimmen</label>
+            <input type="checkbox" name="agb" id="ch1">
+        </div>
+        <div>
+            <label for="r1">Mann</label>
+            <input type="radio" name="gender" id="r1">
+            <label for="r2">Frau</label>
+            <input type="radio" name="gender" id="r2">
+            <label for="r2">Divers</label>
+            <input type="radio" name="gender" id="r3">
+        </div>
+        <div>
+            <textarea name="beschreibung" id="ta1" cols="30" rows="10"></textarea>
+        </div>
+    </form>
+
+</body>
+</html>

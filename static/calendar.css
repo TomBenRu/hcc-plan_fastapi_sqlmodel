@@ -1,0 +1,52 @@
+* {
+    font-family: sans-serif;
+}
+
+.drop_v {
+            background-color:blue;
+        }
+.drop_n {
+            background-color:orange;
+        }
+.drop_g {
+            background-color:green;
+        }
+.grid_center {
+        display: grid;
+        justify-content: center;
+        align-items: center;
+}
+.calendar_table {
+        font: 1em Helvetica, sans-serif;
+        border-collapse: collapse;
+        background-color: #EEEEEE;
+        }
+th, td {
+        font: bold 1em Helvetica, sans-serif;
+        border: thin solid;
+        padding: .5em;
+        }
+td{
+        background-image: linear-gradient(#f9f9f9, #e3e3e3);
+        }
+th {
+        background-color: #B5FF87;
+        }
+.datum_tag {
+        font: bold 1.3em Helvetica, sans-serif;
+        }
+.datum_month {
+        color:  #212f3d;
+        font: 1.3em Helvetica, sans-serif;
+        }
+.datum_year {
+        color:  #212f3d;
+        font: 0.5em Helvetica, sans-serif;
+        }
+.box-head-calendar {
+    background-color: lightgrey;
+    width: 1000px;
+    border: 15px solid green;
+    padding: 50px;
+    margin: 20px;
+}

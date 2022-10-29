@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/calendar.css') }}">
+</head>
+<body>
+<header>
+    <div>{% block name_logo %}{% endblock %}</div>
+    <nav>
+        <ul>
+            <li><a href="#">Start</a> </li>
+            <li><a href="#">über</a> </li>
+            <li><a href="#">Projekte</a> </li>
+            <li><a href="#">Kontakt</a> </li>
+        </ul>
+    </nav>
+    <form action="">
+        <input type="search" name="search" placeholder="Suche...">
+        <input type="submit" value="Finden">
+    </form>
+</header>
+<main>
+    <article>
+        <header>
+            <h1>Artikel Überschrift</h1>
+            <p>Teaser Text</p>
+        </header>
+        <section>
+            <h2>Überschrift 2</h2>
+            <p>Weiterer Absatz</p>
+            <p>Weiterer Absatz</p>
+        </section>
+    </article>
+    <footer>
+        ...zusätzliche Informationen
+    </footer>
+    <aside>
+        <h3>anderer Artikel</h3>
+        <ul>
+            <li><a href="#">Link 1</a></li>
+            <li><a href="#">Link 2</a></li>
+            <li><a href="#">Link 3</a></li>
+            <li><a href="#">Link 4</a></li>
+        </ul>
+    </aside>
+</main>
+<footer>
+    <p>&copy; 2022 by me. All rights resevered.</p>
+</footer>
+
+</body>
+</html>

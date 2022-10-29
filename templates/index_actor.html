@@ -1,0 +1,111 @@
+{% extends "index_base.html" %}
+{% block links %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', path='/calendar.css') }}">
+{% endblock %}
+{% block menu_bar_items %}
+    <div class="w3-dropdown-hover w3-hide-small">
+        <button class="w3-button" title="Notifications">Sperrtemine <i class="fa fa-caret-down"></i></button>
+        <div class="w3-dropdown-content w3-card-4 w3-bar-block">
+            {% for planung_filled_in in plan_periods  %}
+                {% set filled_in = planung_filled_in.filled_in %}
+                {% set text_filled_in = " (Opt. nicht vorh.)" %}
+                {% if filled_in %}
+                    {% set text_filled_in = " (Opt. vorhanden)" %}
+                {% endif %}
+                {% set plan_period = planung_filled_in.plan_period %}
+                <a href="#pp-{{ plan_period.start }}" class="w3-bar-item w3-button">{{ plan_period.start.day }}.{{ plan_period.start.month }}.{{ plan_period.start.year }} - {{ plan_period.end.day }}.{{ plan_period.end.month }}.{{ plan_period.end.year }}{{text_filled_in}}</a>
+            {% endfor %}
+        </div>
+    </div>
+    <a class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="submit_form()">...Termine übertragen...</a>
+    <a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">User</a>
+{% endblock %}
+{% block navbar_small_items %}
+    <a class="w3-bar-item w3-button w3-padding-large" onclick="submit_form()">Termine übertragen</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding-large">User</a>
+{% endblock %}
+
+{% block cont_header %}
+    <p class="w3-xlarge">Hallo {{ f_name }} {{ l_name }}.</p>
+    {% if success %}
+        <p>Die Termine wurden erfolgreich übertragen.</p>
+        <p>Du kannst die Bearbeitung der Sperrtermine fortsetzen.</p>
+    {% else %}
+        <p>Hier kannst du deine Sperrtermine der aktuellen Planungsmonate bearbeiten.</p>
+    {% endif %}
+{% endblock %}
+{% block cont_main %}
+<form method="post" action="{{ url_for('actor_plan_periods_handler') }}" id="form1" class="grid_center">
+    {% for planung_filled_in in plan_periods %}
+        {% set plan_period = planung_filled_in.plan_period %}
+        {% set avail_days = plan_period.avail_days(actor_id) %}
+        <br id="pp-{{plan_period.start}}" style="margin-bottom: 50px">
+        <div class="w3-container w3-dark-grey w3-center" style="margin-top: 20px!important">
+            <h2>vom {{ plan_period.start.day }}.{{ plan_period.start.month }}.{{ plan_period.start.year }} - {{ plan_period.end.day }}.{{ plan_period.end.month }}.{{ plan_period.end.year }}</h2>
+        </div>
+        <table class="calendar_table" id="period_{{plan_period.id}}">
+            <tr>
+                <td></td>
+                {% for wd in ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"] %}
+                    <th>{{ wd }}</th>
+                {% endfor %}
+            </tr>
+            {% for kw, week in plan_period.calender_week_days.items() %}
+                <tr>
+                <th>KW {{ kw }}</th>
+                {% for x in range(week[0][1]) %}
+                    <td></td>
+                {% endfor %}
+                {% for d, wd in week %}
+                    <td align="center">
+                        <a><span class="datum_tag">{{d.day}}</span>
+                            <span class="datum_month">.{{d.month}}</span>
+                            <span class="datum_year">.{{d.year}}</span></a><br>
+                        <a>
+                            {% set select_id = d.day + (d.month|int * 31) + (d.year|int * 366) %}
+                            {% if d in avail_days %}
+                                {% set cl = "drop_" + avail_days[d] %}
+                            {% else %}
+                                {% set cl = "drop_x" %}
+                            {% endif %}
+                            <select class="{{cl}}" name="{{d}}_{{plan_period.id}}" id="{{select_id}}" style="font: 1.0em Helvetica, sans-serif" onchange="select_change({{select_id}})">
+                                {% for val, name in (('x', 'gesperrt'), ('v', 'vorm.'), ('n', 'nachm.'), ('g', 'ganzt.')) %}
+                                    {% if d in avail_days and avail_days[d] == val %}
+                                        <option value="{{val}}" selected>{{name}}</option>
+                                    {% else %}
+                                        <option value="{{val}}">{{name}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </a>
+                    </td>
+                {% endfor %}
+                </tr>
+            {% endfor %}
+
+        </table>
+        <div style="margin-top: 10px">
+            <label for="ta{{plan_period.id}}">zusätzliche Angaben:</label>
+            <br>
+            <textarea name="infos_{{plan_period.id}}" id="ta{{plan_period.id}}" cols="80" rows="3"
+                      placeholder="Hier bitte Zusätzliche Angaben eintragen"
+                      style="margin-top: 5px">{{plan_period.notes_of_availables(actor_id)}}</textarea>
+        </div>
+    {% endfor %}
+</form>
+{% endblock %}
+{% block quote_of_day %}
+{% endblock %}
+{% block cont_script %}
+    {{ super() }}
+    function select_change(e_id) {
+        var elem = document.getElementById(e_id);
+        var val_elem = elem.value;
+        elem.className = 'drop_' + val_elem;
+    }
+
+    function submit_form() {
+        document.getElementById("form1").submit();
+    }
+{% endblock %}

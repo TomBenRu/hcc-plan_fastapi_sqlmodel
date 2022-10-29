@@ -1,0 +1,9 @@
+sqlmodel
+fastapi
+pydantic[email]
+starlette
+python-jose
+Jinja2
+passlib
+uvicorn
+bcrypt
