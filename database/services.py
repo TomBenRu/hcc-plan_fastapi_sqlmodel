@@ -4,7 +4,7 @@ import time
 from typing import Type
 
 from pydantic import EmailStr
-from sqlmodel import Session, select
+from sqlmodel import Session, select, or_
 from .database import engine
 # from pony.orm import Database, db_session, select, TransactionIntegrityError
 
