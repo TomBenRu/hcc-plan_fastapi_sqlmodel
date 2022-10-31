@@ -4,7 +4,7 @@ from fastapi.security.oauth2 import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
 from database.models import Admin
-from database.pydantic_models import TokenData, Token, AdminBase
+from database.auth_models import TokenData, Token
 from database.services import find_user_by_email
 from settings import settings
 from utilities import utils
@@ -52,7 +52,7 @@ def verify_access_token(token: str):
 def verify_su_access_token(token: Token):
     try:
         payload = jwt.decode(token.access_token, SECRET_KEY, algorithms=ALGORITHM)
-        if not (su := payload.get('supervisor')):
+        if not payload.get('supervisor'):
             raise credentials_exception
     except JWTError:
         raise credentials_exception
