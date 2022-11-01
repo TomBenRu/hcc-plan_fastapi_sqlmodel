@@ -143,7 +143,7 @@ class AdminUpdate(SQLModel):
 
 class DispatcherBase(SQLModel):
     person_id: int = Field(foreign_key='person.id')
-    project_id: int
+    project_id: int = Field(foreign_key='project.id')
     activ: bool = True
 
 

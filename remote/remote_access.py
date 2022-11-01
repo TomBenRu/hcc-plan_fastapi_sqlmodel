@@ -128,12 +128,12 @@ def change_status_plan_period(email_dispatcher: str, password_dispatcher: str, p
 
 if __name__ == '__main__':
     # 'new_admin': {'person_id': 1, 'project_id': 1, 'id': 1, 'created_at': '2022-10-31', 'person': {'f_name': 'Anne', 'l_name': 'Feige', 'email': 'anne.feige@funmail.com', 'id': 1}, 'project': {'name': 'CleveClownCompany', 'id': 1, 'created_at': '2022-10-31'}}
-    # 'password': 'WAke8tz24Aw'
+    # 'password': '4k1gaRUPSFA'
     # 'new_admin': {'person_id': 2, 'project_id': 2, 'id': 2, 'created_at': '2022-10-31', 'person': {'f_name': 'Ben', 'l_name': 'Böge', 'email': 'ben.boege@funmail.com', 'id': 2}, 'project': {'name': 'Humor Hilft Heilen', 'id': 2, 'created_at': '2022-10-31'}}
-    # 'password': 'u2gNl71xIjs'
+    # 'password': 'Cm9NNBSnR00'
 
     # 'dispatcher': {'person': {'f_name': 'Thomas', 'l_name': 'Ruff', 'email': 'mail@thomas-ruff.de'}, 'teams': [], 'id': 1}
-    # 'password': 'FRE5R7KpuHk'
+    # 'password': 'HIU4tPftXSk'
 
     # 'actor': {'person': {'f_name': 'Rolf', 'l_name': 'Reichel', 'email': 'rolf.reichel@funmail.com'}, 'team': {'name': 'Mainz', 'project': {'name': 'CleveClownCompany'}}, 'id': 2, 'active': True}
     # 'password': 'Oi53MM0xm1g'
@@ -158,10 +158,10 @@ if __name__ == '__main__':
     # su_login = login_supervisor('supervisor', 'mario')
     # print(su_login)
     #
-    # admin = create_account('CleveClownCompany', 'Anne', 'Feige', 'anne.feige@funmail.com', su_login)
+    # admin = create_account('Humor Hilft Heilen', 'Ben', 'Böge', 'ben.boege@funmail.com', su_login)
     # print(admin)
 
-    admin_login = login_admin('anne.feige@funmail.com', 'WAke8tz24Aw')
+    admin_login = login_admin('anne.feige@funmail.com', '4k1gaRUPSFA')
     print(admin_login)
 
     # new_dispatcher = create_new_dispatcher(person=PersonCreate(f_name='Thomas', l_name='Ruff',
@@ -169,7 +169,7 @@ if __name__ == '__main__':
     #                                        token=admin_login)
     # print(new_dispatcher)
 
-    new_team = create_new_team(team=TeamPostCreate(name='Baden-Württemberg', dispatcher_id=1), admin_token=admin_login)
+    new_team = create_new_team(team=TeamPostCreate(name='Mainz', dispatcher_id=1), admin_token=admin_login)
     print(new_team)
 
 

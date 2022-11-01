@@ -52,6 +52,6 @@ def add_new_team(team: TeamPostCreate, token: Token):
         new_team = create_new_team(team=team, admin_id=token_data.id)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                            detail=f'Team mit Namen {team["name"]} ist schon vorhanden.')
+                            detail=f'Team mit Namen {team.name} ist schon vorhanden.')
     return new_team
 
