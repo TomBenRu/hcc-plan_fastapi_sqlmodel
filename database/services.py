@@ -207,7 +207,8 @@ def create_actor__remote(person: PersonCreate, team_id: int):  # aktuell
         pass
 
     with Session(engine) as session:
-        team_db = session.get(Team, team_id)
+        if not session.get(Team, team_id):
+            raise CustomError(f'No Team with id {team_id} vorhanden.')
         if result := session.exec(select(Actor, Person).where(Actor.person_id == Person.id, Person.email == person.email)).first():  # Actor.get(lambda a: a.email == person.email):
             raise CustomError(f"Es ist schon ein Mitarbeiter mit dieser Email vorhanden. {list(result)}")
         if pers := session.exec(select(Person).where(Person.email == person.email)).first():  # Person.get(lambda p: p.email == person.email):

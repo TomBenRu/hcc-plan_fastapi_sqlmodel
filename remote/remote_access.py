@@ -137,10 +137,12 @@ if __name__ == '__main__':
     # 'dispatcher': {'person': {'f_name': 'Manu', 'l_name': 'Keller', 'email': 'manu.keller@funmail.com'}, 'teams': [], 'id': 4}
     # 'password': '2V7s-9-vOfo'
 
-    # 'actor': {'person': {'f_name': 'Rolf', 'l_name': 'Reichel', 'email': 'rolf.reichel@funmail.com'}, 'team': {'name': 'Mainz', 'project': {'name': 'CleveClownCompany'}}, 'id': 2, 'active': True}
-    # 'password': 'Oi53MM0xm1g'
-    # 'actor': {'person': {'f_name': 'Tanja', 'l_name': 'Thiele', 'email': 'tanja.thiele@funmail.com'}, 'team': {'name': 'Baden-Württemberg', 'project': {'name': 'CleveClownCompany'}}, 'id': 3, 'active': True}
-    # 'password': 'bptIH4-2cac'
+    # 'actor': {'person': {'f_name': 'Rolf', 'l_name': 'Reichel', 'email': 'rolf.reichel@funmail.com', 'id': 6}, 'team': {'name': 'Baden-Württemberg', 'project_id': 1, 'dispatcher_id': 1, 'id': 1, 'created_at': '2022-11-01'}},
+    # 'password': 'raNi_xvWknw'
+    # 'actor': {'person': {'f_name': 'Tanja', 'l_name': 'Thiele', 'email': 'tanja.thiele@funmail.com', 'id': 5}, 'team': {'name': 'Baden-Württemberg', 'project_id': 1, 'dispatcher_id': 1, 'id': 1, 'created_at': '2022-11-01'}},
+    # 'password': 'bgu0X2Ep12M'
+    # 'actor': {'person': {'f_name': 'Beate', 'l_name': 'Blum', 'email': 'beate.blum@funmail.com', 'id': 7}, 'team': {'name': 'Heidelberg', 'project_id': 2, 'dispatcher_id': 2, 'id': 3, 'created_at': '2022-11-01'}}
+    # 'password': 'ehSKe_qfvGE'
 
     # planperiods = get_planperiods('beate.neumann@jokemail.de', 'AoBjrzdNpdA', 0, 0)
     # for pp in planperiods:
@@ -177,8 +179,8 @@ if __name__ == '__main__':
     disp_token = login_dispatcher('manu.keller@funmail.com', '2V7s-9-vOfo')
     print(disp_token)
 
-    new_actor = create_new_actor(PersonCreate(f_name='Tanja', l_name='Thiele',
-                                              email=EmailStr('tanja.thiele@funmail.com')), team_id=1, token=disp_token)
+    new_actor = create_new_actor(PersonCreate(f_name='Chris', l_name='Coni',
+                                              email=EmailStr('chris.coni@funmail.com')), team_id=7, token=disp_token)
     print(new_actor)
 
 
