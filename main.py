@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from starlette.staticfiles import StaticFiles
 
 from database import app as db_app
-from routers import auth, supervisor, admin#, actors, dispatcher, index
+from routers import auth, supervisor, admin, dispatcher  # , actors, dispatcher, index
 
 
 db_app.main()
@@ -20,8 +20,8 @@ app.include_router(auth.router)
 # app.include_router(actors.router)
 #
 app.include_router(admin.router)
-#
-# app.include_router(dispatcher.router)
+
+app.include_router(dispatcher.router)
 
 app.include_router(supervisor.router)
 

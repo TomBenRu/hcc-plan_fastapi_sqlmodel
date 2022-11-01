@@ -37,10 +37,17 @@ def find_user_by_email(email: str, user: Type[Actor | Dispatcher | Admin]) -> Ac
     with Session(engine) as session:
         if user == Admin:
             try:
-                admin, person = session.exec(select(Admin, Person).where(user.person_id == Person.id, Person.email == email)).one()
+                admin, person = session.exec(select(Admin, Person).where(user.person_id == Person.id,
+                                                                         Person.email == email)).one()
                 return admin
             except:
                 return
+        if user == Dispatcher:
+            res = session.exec(select(Dispatcher, Person).where(user.person_id == Person.id,
+                                                                Person.email == email)).first()
+            dispatcher, _ = res if res else [None, None]
+            return dispatcher
+
 
 
         user_sel = session.exec(select(user).where(user.email == email)).one()

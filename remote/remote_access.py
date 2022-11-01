@@ -132,8 +132,10 @@ if __name__ == '__main__':
     # 'new_admin': {'person_id': 2, 'project_id': 2, 'id': 2, 'created_at': '2022-10-31', 'person': {'f_name': 'Ben', 'l_name': 'Böge', 'email': 'ben.boege@funmail.com', 'id': 2}, 'project': {'name': 'Humor Hilft Heilen', 'id': 2, 'created_at': '2022-10-31'}}
     # 'password': 'Cm9NNBSnR00'
 
-    # 'dispatcher': {'person': {'f_name': 'Thomas', 'l_name': 'Ruff', 'email': 'mail@thomas-ruff.de'}, 'teams': [], 'id': 1}
+    # 'dispatcher': {'person': {'f_name': 'Thomas', 'l_name': 'Ruff', 'email': 'mail@thomas-ruff.de'}, 'teams': [], 'id': 3}
     # 'password': 'HIU4tPftXSk'
+    # 'dispatcher': {'person': {'f_name': 'Manu', 'l_name': 'Keller', 'email': 'manu.keller@funmail.com'}, 'teams': [], 'id': 4}
+    # 'password': '2V7s-9-vOfo'
 
     # 'actor': {'person': {'f_name': 'Rolf', 'l_name': 'Reichel', 'email': 'rolf.reichel@funmail.com'}, 'team': {'name': 'Mainz', 'project': {'name': 'CleveClownCompany'}}, 'id': 2, 'active': True}
     # 'password': 'Oi53MM0xm1g'
@@ -161,26 +163,26 @@ if __name__ == '__main__':
     # admin = create_account('Humor Hilft Heilen', 'Ben', 'Böge', 'ben.boege@funmail.com', su_login)
     # print(admin)
 
-    admin_login = login_admin('anne.feige@funmail.com', '4k1gaRUPSFA')
-    print(admin_login)
+    # admin_login = login_admin('ben.boege@funmail.com', 'Cm9NNBSnR00')
+    # print(admin_login)
 
-    # new_dispatcher = create_new_dispatcher(person=PersonCreate(f_name='Thomas', l_name='Ruff',
-    #                                                            email=EmailStr('mail@thomas-ruff.de')),
+    # new_dispatcher = create_new_dispatcher(person=PersonCreate(f_name='Manu', l_name='Keller',
+    #                                                            email=EmailStr('manu.keller@funmail.com')),
     #                                        token=admin_login)
     # print(new_dispatcher)
 
-    new_team = create_new_team(team=TeamPostCreate(name='Mainz', dispatcher_id=1), admin_token=admin_login)
-    print(new_team)
+    # new_team = create_new_team(team=TeamPostCreate(name='Mannheim', dispatcher_id=2), admin_token=admin_login)
+    # print(new_team)
+
+    disp_token = login_dispatcher('mail@thomas-ruff.de', 'Fb8fh6fbQ9Q')
+    print(disp_token)
+
+    new_actor = create_new_actor(PersonBase(f_name='Tanja', l_name='Thiele', email=EmailStr('tanja.thiele@funmail.com')),
+                                 team_id=2, token=disp_token)
+    print(new_actor)
 
 
 
-
-    # disp_token = login_dispatcher('mail@thomas-ruff.de', 'Fb8fh6fbQ9Q')
-    # print(disp_token)
-
-    # new_actor = create_new_actor(PersonBase(f_name='Tanja', l_name='Thiele', email=EmailStr('tanja.thiele@funmail.com')),
-    #                              team_id=2, token=disp_token)
-    # print(new_actor)
 
     # plan_period = create_new_plan_period(disp_token['access_token'], 2, None, '2022-08-31', '2. Planperiode.')
     # print(plan_period)

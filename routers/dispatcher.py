@@ -3,9 +3,9 @@ import datetime
 from fastapi import APIRouter, HTTPException, status, Request, Depends
 from pydantic import EmailStr, json, BaseModel
 
-from databases.database import Dispatcher
-from databases.pydantic_models import Token, TeamBase, PersonBase, ActorCreateBaseRemote, TokenData
-from databases.services import (create_actor__remote, find_user_by_email, create_new_plan_period, get_past_plan_priods,
+from database.models import Dispatcher
+from database.pydantic_models import Token, TeamBase, PersonBase, ActorCreateBaseRemote, TokenData
+from database.services import (create_actor__remote, find_user_by_email, create_new_plan_period, get_past_plan_priods,
                                 change_status_planperiod)
 from oauth2_authentication import (verify_supervisor_username, verify_supervisor_password, create_access_token,
                                    verify_access_token, verify_su_access_token,
