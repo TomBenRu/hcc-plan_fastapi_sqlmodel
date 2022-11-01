@@ -2,9 +2,9 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
 from database.auth_models import Token
-from database.models import Dispatcher, Admin
+from database.models import Dispatcher, Admin, PersonCreate
 # from databases.pony_models import Dispatcher
-from database.pydantic_models import AdminBase, TeamBase, PersonBase
+# from database.pydantic_models import AdminBase, TeamBase, PersonBase
 from database.services import find_user_by_email, create_new_team, create_dispatcher
 from oauth2_authentication import create_access_token, verify_supervisor_username, verify_supervisor_password, \
     verify_admin_username, verify_admin_password, verify_access_token
@@ -23,18 +23,16 @@ def admin_login(username: str, password: str):
 
     access_token = create_access_token(data={'user_id': admin.id})
 
-    return {'access_token': access_token, 'token_type': 'bearer'}
+    return Token(access_token=access_token, token_type='bearer')
 
 
 @router.post('/dispatcher')
-def add_new_dispatcher(person: PersonBase, token: Token):
-    print('in route')
+def add_new_dispatcher(person: PersonCreate, token: Token):
     try:
         token_data = verify_access_token(token.access_token)
     except Exception as e:
         return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=e)
     admin_id = token_data.id
-    print(token_data)
 
     try:
         new_dispatcher = create_dispatcher(person=person, admin_id=admin_id)

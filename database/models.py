@@ -113,6 +113,10 @@ class Admin(AdminBase, table=True):
     person: Person = Relationship(back_populates='admin')
     project: Project = Relationship(back_populates='admin')
 
+    @property
+    def email(self):
+        return self.person.email
+
 
 class AdminRead(AdminBase):
     id: int
@@ -135,6 +139,7 @@ class AdminUpdate(SQLModel):
 
 class DispatcherBase(SQLModel):
     person_id: int = Field(foreign_key='person.id')
+    project_id: int
     activ: bool = True
 
 

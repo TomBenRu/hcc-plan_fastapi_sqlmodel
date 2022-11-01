@@ -1,9 +1,10 @@
 sqlmodel
 fastapi
-pydantic[email]
+pydantic[email, dotenv]
 starlette
 python-jose
 Jinja2
 passlib
 uvicorn
 bcrypt
+requests

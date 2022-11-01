@@ -10,7 +10,8 @@ from .database import engine
 
 from utilities import utils
 from .models import (Team, Person, Actor, PlanPeriod, Availables, AvailDay, Dispatcher, Project, Admin, PersonCreate,
-                     ProjectCreate, AdminRead, ActorCreate, ActorRead, TeamRead, AdminReadAllFields)
+                     ProjectCreate, AdminRead, ActorCreate, ActorRead, TeamRead, AdminReadAllFields,
+                     DispatcherReadAllFields)
 from .enums import ProdType, TimeOfDay
 # from .pydantic_models import (ActorCreateBase, PlanPerEtFilledIn, PlanPeriodBase, ActorBase, DispatcherCreateBase,
 #                               TeamBase, ActorCreateBaseRemote, DispatcherShowBase, DispatcherBase, TeamShowBase,
@@ -32,8 +33,16 @@ def save_new_actor(user: ActorCreate):
     return user_in_db
 
 
-def find_user_by_email(email: str, user: Type[Actor] | Type[Dispatcher] | Type[Admin]) -> Actor | Dispatcher | Admin | None:
+def find_user_by_email(email: str, user: Type[Actor | Dispatcher | Admin]) -> Actor | Dispatcher | Admin | None:
     with Session(engine) as session:
+        if user == Admin:
+            try:
+                admin, person = session.exec(select(Admin, Person).where(user.person_id == Person.id, Person.email == email)).one()
+                return admin
+            except:
+                return
+
+
         user_sel = session.exec(select(user).where(user.email == email)).one()
     return user_sel
 
@@ -121,7 +130,7 @@ def create_new_team(name: str, admin_id: int, dispatcher_id):  # aktuell
         return TeamShowBase.from_orm(team)
 
 
-def create_admin(person: PersonCreate, project: ProjectCreate):  # aktuell
+def create_admin(person: PersonCreate, project: ProjectCreate) -> tuple[AdminReadAllFields, str]:  # aktuell
     password = secrets.token_urlsafe(8)
     hashed_psw = utils.hash_psw(password)
     with Session(engine) as session:
@@ -144,50 +153,36 @@ def create_admin(person: PersonCreate, project: ProjectCreate):  # aktuell
         session.commit()
         session.refresh(admin)
 
-        return AdminReadAllFields.from_orm(admin)
+        return AdminReadAllFields.from_orm(admin), password
 
 
-
-    # person, project = admin.person, admin.project
-    # with db_session:
-    #     if Admin.select(lambda a: a.project.name == admin.project.name):
-    #         raise ValueError('Es gibt bereits ein Projekt dieses Namens.')
-    #     if pers := Person.get(lambda p: p.email == admin.person.email):
-    #         if pers.f_name != admin.person.f_name or pers.l_name != admin.person.l_name:
-    #             raise ValueError('Es gibt bereits eine Person mit dieser Email.')
-    #         else:
-    #             person = PersonBase.from_orm(pers)
-    #     if proj := Project.get(lambda pr: pr.name == admin.project.name):
-    #         project = ProjectBase.from_orm(proj)
-    #
-    #     person = Person(**person.dict())
-    #     project = Project(**project.dict())
-    #     new_admin = Admin(password=hashed_psw, person=person, project=project)
-    #     new_admin.to_dict()
-    #     return AdminShowBase.from_orm(new_admin), password
-
-
-def create_dispatcher(person: PersonCreate, admin_id):  # aktuell
-    print('in create')
-    with db_session:
-        if pers_db := Person.get(lambda p: p.email == person.email):
+def create_dispatcher(person: PersonCreate, admin_id) -> tuple[DispatcherReadAllFields, str]:
+    with Session(engine) as session:
+        project_id = session.get(Admin, admin_id).project_id
+        if pers_db := session.exec(select(Person).where(Person.email == person.email)).first():  # Person.get(lambda p: p.email == person.email):
+            print('gleiche email')
             if pers_db.f_name != person.f_name or pers_db.l_name != person.l_name:
                 print('in exception 1')
                 raise Exception(f'Eine Person mit Email {person.email} ist schon vorhanden, '
                                 f'aber die restlichen Personendaten stimmen nicht überein.')
             else:
                 person_db = pers_db
-                if Dispatcher.get(lambda d: d.person == person_db):
+                if session.exec(select(Dispatcher).where(Dispatcher.person_id == person_db.id)).first():  # Dispatcher.get(lambda d: d.person == person_db):
                     print('in exception 2')
                     raise Exception(f'Ein*e Disponent*in mit dieser Person ist schon vorhanden.')
         else:
-            person_db = Person(**person.dict())
+            person_db = person
+            person_db = Person.from_orm(person_db)
+            session.add(person_db)
+            session.commit()
+            session.refresh(person_db)
         password = secrets.token_urlsafe(8)
         hashed_psw = utils.hash_psw(password)
-        new_dispatcher = Dispatcher(password=hashed_psw, person=person_db)
-        new_dispatcher.to_dict()
-        dispatcher_base = DispatcherShowBase.from_orm(new_dispatcher)
-    return {'dispatcher': dispatcher_base, 'password': password}
+        new_dispatcher = Dispatcher(password=hashed_psw, person_id=person_db.id, project_id=project_id)
+        session.add(new_dispatcher)
+        session.commit()
+        session.refresh(new_dispatcher)
+        return DispatcherReadAllFields.from_orm(new_dispatcher), password
 
 
 def create_actor__remote(person: PersonCreate, team_id: int):  # aktuell
