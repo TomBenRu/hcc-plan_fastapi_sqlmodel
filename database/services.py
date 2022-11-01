@@ -11,7 +11,7 @@ from .database import engine
 from utilities import utils
 from .models import (Team, Person, Actor, PlanPeriod, Availables, AvailDay, Dispatcher, Project, Admin, PersonCreate,
                      ProjectCreate, AdminRead, ActorCreate, ActorRead, TeamRead, AdminReadAllFields,
-                     DispatcherReadAllFields)
+                     DispatcherReadAllFields, TeamReadAllFields, TeamCreate, TeamPostCreate)
 from .enums import ProdType, TimeOfDay
 # from .pydantic_models import (ActorCreateBase, PlanPerEtFilledIn, PlanPeriodBase, ActorBase, DispatcherCreateBase,
 #                               TeamBase, ActorCreateBaseRemote, DispatcherShowBase, DispatcherBase, TeamShowBase,
@@ -122,12 +122,22 @@ def get_actor_by_id(actor_id: int) -> ActorRead:
         return ActorBase.from_orm(actor)
 
 
-def create_new_team(name: str, admin_id: int, dispatcher_id):  # aktuell
-    with db_session:
-        if Team.select(lambda t: t.name == name):
-            raise EOFError
-        team = Team(name=name, project=Admin[admin_id].project, dispatcher=Dispatcher[dispatcher_id])
-        return TeamShowBase.from_orm(team)
+def create_new_team(team: TeamPostCreate, admin_id: int):
+    with Session(engine) as session:
+        try:
+            disp_proj_id = session.get(Dispatcher, team.dispatcher_id).project_id
+        except Exception as e:
+            return e
+        adm_proj_id = session.get(Admin, admin_id).project_id
+        if adm_proj_id != session.get(Dispatcher, team.dispatcher_id).project_id:
+            raise Exception(f'dispatcher belongs not to your project {session.get(Project, disp_proj_id).name}')
+        if session.exec(select(Team).where(Team.name == team.name, Team.project_id == adm_proj_id)).first():
+            raise Exception(f'A team with name {team.name} is allready in your project.')
+        team = Team(name=team.name, project_id=adm_proj_id, dispatcher_id=team.dispatcher_id)
+        session.add(team)
+        session.commit()
+        session.refresh(team)
+        return TeamRead.from_orm(team)
 
 
 def create_admin(person: PersonCreate, project: ProjectCreate) -> tuple[AdminReadAllFields, str]:  # aktuell

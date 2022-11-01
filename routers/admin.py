@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
 from database.auth_models import Token
-from database.models import Dispatcher, Admin, PersonCreate
+from database.models import Dispatcher, Admin, PersonCreate, TeamCreate, TeamPostCreate
 # from databases.pony_models import Dispatcher
 # from database.pydantic_models import AdminBase, TeamBase, PersonBase
 from database.services import find_user_by_email, create_new_team, create_dispatcher
@@ -42,17 +42,16 @@ def add_new_dispatcher(person: PersonCreate, token: Token):
 
 
 @router.post('/team')
-def add_new_team(team_name: dict[str, str], token: Token, dispatcher: dict[str, int]):
-    name = team_name['name']
-    dispatcher_id = dispatcher['dispatcher_id']
+def add_new_team(team: TeamPostCreate, token: Token):
+    print('in route')
     try:
         token_data = verify_access_token(token.access_token)
     except Exception as e:
         return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=e)
     try:
-        new_team = create_new_team(name=name, admin_id=token_data.id, dispatcher_id=dispatcher_id)
+        new_team = create_new_team(team=team, admin_id=token_data.id)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                            detail=f'Teem mit Namen {name} ist schon vorhanden.')
+                            detail=f'Team mit Namen {team["name"]} ist schon vorhanden.')
     return new_team
 

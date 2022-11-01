@@ -68,6 +68,10 @@ class TeamCreate(TeamBase):
     pass
 
 
+class TeamPostCreate(TeamBase):
+    project_id: Optional[int] = None
+
+
 class TeamUpdate(SQLModel):
     name: Optional[str] = None
     project_id: Optional[int] = None

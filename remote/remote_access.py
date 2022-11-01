@@ -6,7 +6,7 @@ from pydantic import EmailStr
 from requests.exceptions import ConnectionError
 import time
 
-from database.models import PersonBase, PersonCreate
+from database.models import PersonBase, PersonCreate, TeamPostCreate
 
 from database.auth_models import Token
 
@@ -48,10 +48,9 @@ def create_new_dispatcher(person: PersonCreate, token: Token):
     return response.json()
 
 
-def create_new_team(name: str, admin_token: dict, dispatcher_id: int):
+def create_new_team(team: TeamPostCreate, admin_token: dict):
     response = requests.post(f'{SERVER_ADDRESS}/admin/team',
-                             json={'team_name': {'name': name}, 'token': admin_token,
-                                   'dispatcher': {'dispatcher_id': dispatcher_id}})
+                             json={'team': team.dict(), 'token': admin_token})
     return response.json()
 
 
@@ -165,16 +164,16 @@ if __name__ == '__main__':
     admin_login = login_admin('anne.feige@funmail.com', 'WAke8tz24Aw')
     print(admin_login)
 
-    new_dispatcher = create_new_dispatcher(person=PersonCreate(f_name='Thomas', l_name='Ruff',
-                                                               email=EmailStr('mail@thomas-ruff.de')),
-                                           token=admin_login)
-    print(new_dispatcher)
+    # new_dispatcher = create_new_dispatcher(person=PersonCreate(f_name='Thomas', l_name='Ruff',
+    #                                                            email=EmailStr('mail@thomas-ruff.de')),
+    #                                        token=admin_login)
+    # print(new_dispatcher)
+
+    new_team = create_new_team(team=TeamPostCreate(name='Baden-Württemberg', dispatcher_id=1), admin_token=admin_login)
+    print(new_team)
 
 
 
-
-    # new_team = create_new_team('Baden-Württemberg', admin_login, dispatcher_id=1)
-    # print(new_team)
 
     # disp_token = login_dispatcher('mail@thomas-ruff.de', 'Fb8fh6fbQ9Q')
     # print(disp_token)
