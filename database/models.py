@@ -221,7 +221,6 @@ class ActorRead(ActorBase):
 class ActorReadAllFields(ActorRead):
     person: PersonRead
     team: TeamRead
-    availables: 'AvailablesRead'
 
 
 class ActorCreate(ActorBase):
@@ -334,3 +333,5 @@ class AvailDaysUpdate(SQLModel):
     time_of_day: Optional[TimeOfDay] = None
     availables_id: Optional[int] = None
 
+
+ActorReadAllFields.update_forward_refs(**locals())

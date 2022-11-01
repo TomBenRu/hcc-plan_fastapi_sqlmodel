@@ -38,7 +38,7 @@ def create_access_token(data: dict):
     return encoded_jwt
 
 
-def verify_access_token(token: str):
+def verify_access_token(token: str) -> TokenData:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
         if not (u_id := payload.get('user_id')):

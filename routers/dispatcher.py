@@ -3,7 +3,7 @@ import datetime
 from fastapi import APIRouter, HTTPException, status, Request, Depends
 from pydantic import EmailStr, json, BaseModel
 
-from database.models import Dispatcher
+from database.models import Dispatcher, PersonCreate
 from database.pydantic_models import Token, TeamBase, PersonBase, ActorCreateBaseRemote, TokenData
 from database.services import (create_actor__remote, find_user_by_email, create_new_plan_period, get_past_plan_priods,
                                 change_status_planperiod)
@@ -28,9 +28,10 @@ def dispatcher_login(email: str, password: str):
 
 
 @router.post('/actor')
-def create_new_actor(person: PersonBase, team: dict[str, int], token: Token):
+def create_new_actor(person: PersonCreate, team: dict[str, int], token: Token):
     try:
         token_data = verify_access_token(token.access_token)
+        disp_id = token_data.id
     except Exception as e:
         return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=e)
 

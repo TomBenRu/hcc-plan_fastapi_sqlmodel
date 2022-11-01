@@ -68,7 +68,7 @@ def login_dispatcher(email: str, password: str) -> dict[str, str]:
     raise connection_error
 
 
-def create_new_actor(person: PersonBase, team_id, token: dict):
+def create_new_actor(person: PersonCreate, team_id, token: dict):
     response = requests.post(
         f'{SERVER_ADDRESS}/dispatcher/actor',
         json={'person': person.dict(), 'team': {'team_id': team_id}, 'token': token})
@@ -174,11 +174,11 @@ if __name__ == '__main__':
     # new_team = create_new_team(team=TeamPostCreate(name='Mannheim', dispatcher_id=2), admin_token=admin_login)
     # print(new_team)
 
-    disp_token = login_dispatcher('mail@thomas-ruff.de', 'Fb8fh6fbQ9Q')
+    disp_token = login_dispatcher('manu.keller@funmail.com', '2V7s-9-vOfo')
     print(disp_token)
 
-    new_actor = create_new_actor(PersonBase(f_name='Tanja', l_name='Thiele', email=EmailStr('tanja.thiele@funmail.com')),
-                                 team_id=2, token=disp_token)
+    new_actor = create_new_actor(PersonCreate(f_name='Tanja', l_name='Thiele',
+                                              email=EmailStr('tanja.thiele@funmail.com')), team_id=1, token=disp_token)
     print(new_actor)
 
 

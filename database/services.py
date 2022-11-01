@@ -11,7 +11,7 @@ from .database import engine
 from utilities import utils
 from .models import (Team, Person, Actor, PlanPeriod, Availables, AvailDay, Dispatcher, Project, Admin, PersonCreate,
                      ProjectCreate, AdminRead, ActorCreate, ActorRead, TeamRead, AdminReadAllFields,
-                     DispatcherReadAllFields, TeamReadAllFields, TeamCreate, TeamPostCreate)
+                     DispatcherReadAllFields, TeamReadAllFields, TeamCreate, TeamPostCreate, ActorReadAllFields)
 from .enums import ProdType, TimeOfDay
 # from .pydantic_models import (ActorCreateBase, PlanPerEtFilledIn, PlanPeriodBase, ActorBase, DispatcherCreateBase,
 #                               TeamBase, ActorCreateBaseRemote, DispatcherShowBase, DispatcherBase, TeamShowBase,
@@ -206,22 +206,28 @@ def create_actor__remote(person: PersonCreate, team_id: int):  # aktuell
     class CustomError(Exception):
         pass
 
-    with db_session:
-        team_db = Team[team_id]
-        if Actor.get(lambda a: a.email == person.email):
-            raise CustomError("Es ist schon ein Mitarbeiter mit dieser Email vorhanden.")
-        if pers := Person.get(lambda p: p.email == person.email):
+    with Session(engine) as session:
+        team_db = session.get(Team, team_id)
+        if result := session.exec(select(Actor, Person).where(Actor.person_id == Person.id, Person.email == person.email)).first():  # Actor.get(lambda a: a.email == person.email):
+            raise CustomError(f"Es ist schon ein Mitarbeiter mit dieser Email vorhanden. {list(result)}")
+        if pers := session.exec(select(Person).where(Person.email == person.email)).first():  # Person.get(lambda p: p.email == person.email):
             if pers.f_name != person.f_name or pers.l_name != person.l_name:
                 raise CustomError('Es gibt bereits eine Person mit dieser Email, '
                                   'aber die sonstigen Personendaten stimmen nicht überein.')
             else:
                 person_db = pers
         else:
-            person_db = Person(**person.dict())
+            person_db = Person.from_orm(person)
+            session.add(person_db)
+            session.commit()
+            session.refresh(person_db)
         password = secrets.token_urlsafe(8)
         hashed_psw = utils.hash_psw(password)
-        new_actor = Actor(person=person_db, team=team_db, password=hashed_psw)
-        return {'actor': ActorShowBase.from_orm(new_actor), 'password': password}
+        new_actor = Actor(person_id=person_db.id, team_id=team_id, password=hashed_psw)
+        session.add(new_actor)
+        session.commit()
+        session.refresh(new_actor)
+        return {'actor': ActorReadAllFields.from_orm(new_actor), 'password': password}
 
 
 def get_team_by_name(name: str) -> TeamRead:
