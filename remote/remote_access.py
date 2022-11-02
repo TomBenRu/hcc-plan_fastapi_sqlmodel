@@ -1,12 +1,13 @@
 """Der Supervisor legt den Erstzugang für den Admin an
    Der Admin kann neue Teams anlegen und  den zugehörigen Dispatcher (auch mehrere) einrichten."""
+import datetime
 
 import requests
 from pydantic import EmailStr
 from requests.exceptions import ConnectionError
 import time
 
-from database.models import PersonBase, PersonCreate, TeamPostCreate
+from database.models import PersonBase, PersonCreate, TeamPostCreate, PlanPeriodCreate
 
 from database.auth_models import Token
 
@@ -75,14 +76,13 @@ def create_new_actor(person: PersonCreate, team_id, token: dict):
     return response.json()
 
 
-def create_new_plan_period(access_token: str, team_id: int, date_start: str | None, date_end: str, notes: str | None):
-
-    date_start = '' if not date_start else date_start
-    notes = '' if not notes else notes
-
-    response = requests.get(f'{SERVER_ADDRESS}/dispatcher/new-planperiod',
-                            params={'access_token': access_token, 'team_id': team_id, 'date_start': date_start, 'date_end': date_end,
-                                    'notes': notes})
+def create_new_plan_period(planperiod: PlanPeriodCreate, token: Token):
+    start = planperiod.start.strftime("%Y-%m-%d") if planperiod.start else None
+    end = planperiod.end.strftime("%Y-%m-%d")
+    response = requests.post(f'{SERVER_ADDRESS}/dispatcher/new-planperiod',
+                             json={'planperiod': {"start": start, "end": end, "team_id": planperiod.team_id,
+                                                  "notes": planperiod.notes},
+                                   'token': token.dict()})
     return response.json()
 
 
@@ -179,15 +179,14 @@ if __name__ == '__main__':
     disp_token = login_dispatcher('manu.keller@funmail.com', '2V7s-9-vOfo')
     print(disp_token)
 
-    new_actor = create_new_actor(PersonCreate(f_name='Chris', l_name='Coni',
-                                              email=EmailStr('chris.coni@funmail.com')), team_id=7, token=disp_token)
-    print(new_actor)
+    # new_actor = create_new_actor(PersonCreate(f_name='Chris', l_name='Coni',
+    #                                           email=EmailStr('chris.coni@funmail.com')), team_id=7, token=disp_token)
+    # print(new_actor)
 
-
-
-
-    # plan_period = create_new_plan_period(disp_token['access_token'], 2, None, '2022-08-31', '2. Planperiode.')
-    # print(plan_period)
+    plan_period = create_new_plan_period(planperiod=PlanPeriodCreate(end=datetime.date(year=2023, month=3, day=15),
+                                                                     team_id=4, notes='wieder eine Periode'),
+                                         token=Token.parse_obj(disp_token))
+    print(plan_period)
 
 
 # todo: Zugang Admin remote und online.

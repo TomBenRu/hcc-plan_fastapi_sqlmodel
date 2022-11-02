@@ -3,7 +3,7 @@ import datetime
 from fastapi import APIRouter, HTTPException, status, Request, Depends
 from pydantic import EmailStr, json, BaseModel
 
-from database.models import Dispatcher, PersonCreate
+from database.models import Dispatcher, PersonCreate, PlanPeriodCreate
 from database.pydantic_models import Token, TeamBase, PersonBase, ActorCreateBaseRemote, TokenData
 from database.services import (create_actor__remote, find_user_by_email, create_new_plan_period, get_past_plan_priods,
                                 change_status_planperiod)
@@ -45,23 +45,17 @@ def create_new_actor(person: PersonCreate, team: dict[str, int], token: Token):
     return new_actor
 
 
-@router.get('/new-planperiod')
-def new_planperiod(access_token: str, team_id: int, date_start: str, date_end: str, notes: str = ''):
+@router.post('/new-planperiod')
+def new_planperiod(planperiod: PlanPeriodCreate, token: Token):
     try:
-        token_data = verify_access_token(access_token)
+        token_data = verify_access_token(token.access_token)
     except Exception as e:
         return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='wrong cedentials')
     dispatcher_id = token_data.id
 
-    if not date_start:
-        date_start = None
-    else:
-        date_start = datetime.date(*[int(v) for v in date_start.split('-')])
-    date_end = datetime.date(*[int(v) for v in date_end.split('-')])
     try:
-        new_plan_period = create_new_plan_period(int(team_id), date_start, date_end, notes)
-    except ValueError as e:
-        print('Exception:', e)
+        new_plan_period = create_new_plan_period(planperiod, dispatcher_id)
+    except Exception as e:
         return HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'Fehler: {e}')
 
     return new_plan_period

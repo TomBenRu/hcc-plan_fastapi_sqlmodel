@@ -261,7 +261,7 @@ class PlanPeriodReadAllFields(PlanPeriodRead):
 
 
 class PlanPeriodCreate(PlanPeriodBase):
-    pass
+    start: Optional[date] = None
 
 
 class PlanPeriodUpdate(SQLModel):

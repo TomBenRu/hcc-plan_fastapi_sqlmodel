@@ -11,11 +11,16 @@ from .database import engine
 from utilities import utils
 from .models import (Team, Person, Actor, PlanPeriod, Availables, AvailDay, Dispatcher, Project, Admin, PersonCreate,
                      ProjectCreate, AdminRead, ActorCreate, ActorRead, TeamRead, AdminReadAllFields,
-                     DispatcherReadAllFields, TeamReadAllFields, TeamCreate, TeamPostCreate, ActorReadAllFields)
+                     DispatcherReadAllFields, TeamReadAllFields, TeamCreate, TeamPostCreate, ActorReadAllFields,
+                     PlanPeriodRead, PlanPeriodCreate)
 from .enums import ProdType, TimeOfDay
 # from .pydantic_models import (ActorCreateBase, PlanPerEtFilledIn, PlanPeriodBase, ActorBase, DispatcherCreateBase,
 #                               TeamBase, ActorCreateBaseRemote, DispatcherShowBase, DispatcherBase, TeamShowBase,
 #                               ActorShowBase, AdminCreateBase, ProjectBase, AdminShowBase, PersonBase, AdminBase)
+
+
+class CustomError(Exception):
+    pass
 
 
 def save_new_actor(user: ActorCreate):
@@ -203,9 +208,6 @@ def create_dispatcher(person: PersonCreate, admin_id) -> tuple[DispatcherReadAll
 
 
 def create_actor__remote(person: PersonCreate, team_id: int):  # aktuell
-    class CustomError(Exception):
-        pass
-
     with Session(engine) as session:
         if not session.get(Team, team_id):
             raise CustomError(f'No Team with id {team_id} vorhanden.')
@@ -239,25 +241,32 @@ def get_team_by_name(name: str) -> TeamRead:
         return TeamBase.from_orm(team)
 
 
-def create_new_plan_period(team_id: int, date_start: datetime.date | None, date_end: datetime.date, notes: str):  # aktuell
-    with db_session:
+def create_new_plan_period(planperiod: PlanPeriodCreate, dispatcher_id: int):
+    with Session(engine) as session:
+        disp_proj_id = session.get(Dispatcher, dispatcher_id).project_id
+        print(disp_proj_id)
+        if not session.exec(select(Team).where(Team.id == planperiod.team_id, Team.project_id == disp_proj_id)).first():
+            raise CustomError(f'Kein Team mit ID {planperiod.team_id} vorhanden.')
         max_date: datetime.date | None = None
-        if planperiods := PlanPeriod.select(lambda pp: pp.team.id == team_id):
+        if planperiods := session.exec(select(PlanPeriod).where(PlanPeriod.team_id == planperiod.team_id)).all():  # PlanPeriod.select(lambda pp: pp.team.id == team_id):
             print(list(pp.end for pp in planperiods))
             max_date: datetime.date = max(pp.end for pp in planperiods)
-        if not date_start:
+        if not planperiod.start:
             if not max_date:
                 raise ValueError('Sie müssen ein Startdatum angeben.')
             else:
-                date_start = max_date + datetime.timedelta(days=1)
+                planperiod.start = max_date + datetime.timedelta(days=1)
 
-        elif max_date and date_start <= max_date:
+        elif max_date and planperiod.start <= max_date:
             raise ValueError('Das Startdatum befindet sich in der letzten Planungsperiode.')
-        if date_end < date_start:
+        if planperiod.end < planperiod.start:
             raise ValueError('Das Enddatum darf nicht vor dem Startdatum liegen.')
 
-        plan_period = PlanPeriod(start=date_start, end=date_end, notes=notes, team=Team.get(lambda t: t.id == team_id))
-        return PlanPeriodBase.from_orm(plan_period)
+        plan_period = PlanPeriod.from_orm(planperiod)
+        session.add(plan_period)
+        session.commit()
+        session.refresh(plan_period)
+        return PlanPeriodRead.from_orm(plan_period)
 
 
 def change_status_planperiod(plan_period_id: int, closed: bool, dispatcher_id: int):
