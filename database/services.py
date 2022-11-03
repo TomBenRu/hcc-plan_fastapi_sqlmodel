@@ -12,7 +12,7 @@ from utilities import utils
 from .models import (Team, Person, Actor, PlanPeriod, Availables, AvailDay, Dispatcher, Project, Admin, PersonCreate,
                      ProjectCreate, AdminRead, ActorCreate, ActorRead, TeamRead, AdminReadAllFields,
                      DispatcherReadAllFields, TeamReadAllFields, TeamCreate, TeamPostCreate, ActorReadAllFields,
-                     PlanPeriodRead, PlanPeriodCreate)
+                     PlanPeriodRead, PlanPeriodCreate, PlanPeriodReadAllFields)
 from .enums import ProdType, TimeOfDay
 # from .pydantic_models import (ActorCreateBase, PlanPerEtFilledIn, PlanPeriodBase, ActorBase, DispatcherCreateBase,
 #                               TeamBase, ActorCreateBaseRemote, DispatcherShowBase, DispatcherBase, TeamShowBase,
@@ -111,15 +111,28 @@ def get_plan_periods_from_ids(planperiods: list[int]):
 def get_past_plan_priods(dispatcher_id: int, nbr_past_planperiods: int, only_not_closed: bool = False):
     """nbr_past_planperiods: positiver Wert -> Anzahl zurückliegender Planperioden.
        0 -> alle Planperioden"""
-    with db_session:
-        planperiods = PlanPeriod.select(lambda pp: (dispatcher_id in pp.dispatchers.id))
-        if nbr_past_planperiods > 0:
-            planperiods = planperiods.order_by(PlanPeriod.end)[:nbr_past_planperiods]
+    with Session(engine) as session:
+        statement = select(PlanPeriod, Team).where(PlanPeriod.team_id == Team.id, Team.dispatcher_id == dispatcher_id)
         if only_not_closed:
-            planperiods = (pp for pp in planperiods if not pp.closed)
+            statement = statement.where(PlanPeriod.closed == False)
+        planperiods = session.exec(statement).all()
+        nbr_past_planperiods = nbr_past_planperiods if nbr_past_planperiods <= len(planperiods) else len(planperiods)
 
-        planperiods = [PlanPeriodBase.from_orm(pp) for pp in planperiods]
-    return planperiods
+        planperiods = [PlanPeriodReadAllFields.from_orm(pp) for pp, _ in planperiods][-nbr_past_planperiods:]
+
+        return planperiods
+
+
+def change_status_planperiod(plan_period_id: int, closed: bool, dispatcher_id: int):
+    with Session(engine) as session:
+        if not (planperiod_team := session.exec(select(PlanPeriod, Team).where(PlanPeriod.team_id == Team.id,
+                                                                          Team.dispatcher_id == dispatcher_id)).first()):
+            raise KeyError(f'Die Planperiode mit ID: {plan_period_id} ist nicht vorhanden')
+        planperiod = planperiod_team[0]
+        planperiod.closed = closed
+        session.commit()
+        session.refresh(planperiod)
+        return PlanPeriodReadAllFields.from_orm(planperiod)
 
 
 def get_all_actors():
@@ -267,18 +280,6 @@ def create_new_plan_period(planperiod: PlanPeriodCreate, dispatcher_id: int):
         session.commit()
         session.refresh(plan_period)
         return PlanPeriodRead.from_orm(plan_period)
-
-
-def change_status_planperiod(plan_period_id: int, closed: bool, dispatcher_id: int):
-    with db_session:
-        try:
-            plan_period = PlanPeriod[plan_period_id]
-        except Exception as e:
-            raise KeyError(f'Die Planperiode mit ID: {plan_period_id} ist nicht vorhanden')
-        if Dispatcher[dispatcher_id] not in PlanPeriod[plan_period_id].dispatchers:
-            raise KeyError(f'Die Planperiode mit ID: {plan_period_id} ist nicht vorhanden.')
-        plan_period.closed = closed
-        return PlanPeriodBase.from_orm(plan_period)
 
 
 if __name__ == '__main__':

@@ -257,7 +257,7 @@ class PlanPeriodRead(PlanPeriodBase):
 
 class PlanPeriodReadAllFields(PlanPeriodRead):
     team: TeamRead
-    availables: List['AvailablesRead']
+    # availables: List['AvailablesRead']
 
 
 class PlanPeriodCreate(PlanPeriodBase):

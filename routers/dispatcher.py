@@ -62,7 +62,7 @@ def new_planperiod(planperiod: PlanPeriodCreate, token: Token):
 
 
 @router.get('/get-planperiods')
-def get_planperiods(access_token: str, nbr_past_planperiods: int, only_not_closed: int):
+def get_planperiods(nbr_past_planperiods: int, only_not_closed: int, access_token: str):
     """nbr_past_planperiods: positiver Wert -> Anzahl zurückliegender Planperioden.
        0 -> alle Planperioden"""
     try:
@@ -78,7 +78,7 @@ def get_planperiods(access_token: str, nbr_past_planperiods: int, only_not_close
     return plan_periods
 
 
-@router.get('/status-planperiod')
+@router.patch('/status-planperiod')
 def status_planperiod(access_token: str, plan_period_id: int, closed: int):
     print('bin drin')
     try:
