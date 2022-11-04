@@ -43,7 +43,6 @@ def add_new_dispatcher(person: PersonCreate, token: Token):
 
 @router.post('/team')
 def add_new_team(team: TeamPostCreate, token: Token):
-    print('in route')
     try:
         token_data = verify_access_token(token.access_token)
     except Exception as e:

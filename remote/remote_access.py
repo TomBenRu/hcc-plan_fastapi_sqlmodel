@@ -23,7 +23,6 @@ def login_supervisor(username: str, password: str):
                                      params={'username': username, 'password': password})
             return response.json()
         except ConnectionError as e:
-            print(e)
             connection_error = e
             time.sleep(0.2)
     raise connection_error

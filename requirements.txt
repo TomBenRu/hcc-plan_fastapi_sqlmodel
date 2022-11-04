@@ -8,3 +8,4 @@ passlib
 uvicorn
 bcrypt
 requests
+python-multipart

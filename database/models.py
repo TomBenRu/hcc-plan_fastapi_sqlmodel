@@ -1,11 +1,11 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from pydantic import EmailStr
 
 from database.enums import TimeOfDay
 
-from typing import List, Optional
-from sqlmodel import Field, Relationship, Session, SQLModel, create_engine, select
+from typing import List, Optional, Any, Dict
+from sqlmodel import Field, Relationship, Session, SQLModel, create_engine, select, Column, Enum
 
 
 class ProjectBase(SQLModel):
@@ -250,6 +250,37 @@ class PlanPeriod(PlanPeriodBase, table=True):
     def dispatchers(self):
         return self.team.dispatcher
 
+    @property
+    def all_days(self):
+        delta: timedelta = self.end - self.start
+        all_days: list[datetime.date] = []
+        for i in range(delta.days + 1):
+            day = self.start + timedelta(days=i)
+            all_days.append(day)
+        return all_days
+
+    @property
+    def calender_week_days(self):
+        kw__day_wd = {d.isocalendar()[1]: [] for d in self.all_days}
+        for day in self.all_days:
+            kw__day_wd[day.isocalendar()[1]].append((day, date.weekday(day)))
+        return kw__day_wd
+
+    def avail_days(self, actor_id: int) -> dict[date, Any]:
+        av_days = {}
+        for available in self.availables:
+            if available.actor.id != actor_id:
+                continue
+            for av_d in available.avail_days:
+                av_days[av_d.day] = av_d.time_of_day.value
+        return av_days
+
+    def notes_of_availables(self, actor_id: int) -> str:
+        for avail in self.availables:
+            if avail.actor.id == actor_id:
+                return avail.notes
+        return ''
+
 
 class PlanPeriodRead(PlanPeriodBase):
     id: int
@@ -307,7 +338,7 @@ class AvailablesUpdate(SQLModel):
 
 class AvailDayBase(SQLModel):
     day: date
-    time_of_day: TimeOfDay
+    time_of_day: TimeOfDay = Field(sa_column=Column(Enum(TimeOfDay)))
     availables_id: int = Field(foreign_key='availables.id')
 
 
@@ -332,6 +363,12 @@ class AvailDaysUpdate(SQLModel):
     day: Optional[date] = None
     time_of_day: Optional[TimeOfDay] = None
     availables_id: Optional[int] = None
+
+
+class PlanPerEtAvailDays(SQLModel):
+    plan_period: PlanPeriod
+    avail_days: Dict[date, str]
+    notes_of_availables: str
 
 
 ActorReadAllFields.update_forward_refs(**locals())

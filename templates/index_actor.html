@@ -7,13 +7,13 @@
     <div class="w3-dropdown-hover w3-hide-small">
         <button class="w3-button" title="Notifications">Sperrtemine <i class="fa fa-caret-down"></i></button>
         <div class="w3-dropdown-content w3-card-4 w3-bar-block">
-            {% for planung_filled_in in plan_periods  %}
-                {% set filled_in = planung_filled_in.filled_in %}
-                {% set text_filled_in = " (Opt. nicht vorh.)" %}
-                {% if filled_in %}
-                    {% set text_filled_in = " (Opt. vorhanden)" %}
+            {% for planung__avail_days in plan_periods  %}
+                {% set avail_days = planung__avail_days.avail_days %}
+                {% set text__avail_days = " (Opt. nicht vorh.)" %}
+                {% if avail_days %}
+                    {% set text__avail_days = " (Opt. vorhanden)" %}
                 {% endif %}
-                {% set plan_period = planung_filled_in.plan_period %}
+                {% set plan_period = planung__avail_days.plan_period %}
                 <a href="#pp-{{ plan_period.start }}" class="w3-bar-item w3-button">{{ plan_period.start.day }}.{{ plan_period.start.month }}.{{ plan_period.start.year }} - {{ plan_period.end.day }}.{{ plan_period.end.month }}.{{ plan_period.end.year }}{{text_filled_in}}</a>
             {% endfor %}
         </div>
@@ -37,9 +37,9 @@
 {% endblock %}
 {% block cont_main %}
 <form method="post" action="{{ url_for('actor_plan_periods_handler') }}" id="form1" class="grid_center">
-    {% for planung_filled_in in plan_periods %}
-        {% set plan_period = planung_filled_in.plan_period %}
-        {% set avail_days = plan_period.avail_days(actor_id) %}
+    {% for planung__avail_days in plan_periods %}
+        {% set plan_period = planung__avail_days.plan_period %}
+        {% set avail_days = planung__avail_days.avail_days %}
         <br id="pp-{{plan_period.start}}" style="margin-bottom: 50px">
         <div class="w3-container w3-dark-grey w3-center" style="margin-top: 20px!important">
             <h2>vom {{ plan_period.start.day }}.{{ plan_period.start.month }}.{{ plan_period.start.year }} - {{ plan_period.end.day }}.{{ plan_period.end.month }}.{{ plan_period.end.year }}</h2>
@@ -90,7 +90,7 @@
             <br>
             <textarea name="infos_{{plan_period.id}}" id="ta{{plan_period.id}}" cols="80" rows="3"
                       placeholder="Hier bitte Zusätzliche Angaben eintragen"
-                      style="margin-top: 5px">{{plan_period.notes_of_availables(actor_id)}}</textarea>
+                      style="margin-top: 5px">{{planung__avail_days.notes_of_availables}}</textarea>
         </div>
     {% endfor %}
 </form>

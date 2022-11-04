@@ -80,7 +80,6 @@ def get_planperiods(nbr_past_planperiods: int, only_not_closed: int, access_toke
 
 @router.patch('/status-planperiod')
 def status_planperiod(access_token: str, plan_period_id: int, closed: int):
-    print('bin drin')
     try:
         token_data = verify_access_token(access_token)
     except Exception as e:

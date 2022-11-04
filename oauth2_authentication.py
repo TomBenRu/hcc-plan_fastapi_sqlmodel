@@ -68,7 +68,6 @@ def get_current_user_cookie(request: Request, token_key: str):
 
 
 def get_current_supervisor(token: str = Depends(oauth2_scheme_su)):
-    print('##############################')
     return verify_access_token(token)
 
 
