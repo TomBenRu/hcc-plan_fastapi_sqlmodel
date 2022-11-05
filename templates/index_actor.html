@@ -63,7 +63,7 @@
                             <span class="datum_month">.{{d.month}}</span>
                             <span class="datum_year">.{{d.year}}</span></a><br>
                         <a>
-                            {% set select_id = d.day + (d.month|int * 31) + (d.year|int * 366) %}
+                            {% set select_id = d.day + (d.month|int * 32) + (d.year|int * 385) %}
                             {% if d in avail_days %}
                                 {% set cl = "drop_" + avail_days[d] %}
                             {% else %}

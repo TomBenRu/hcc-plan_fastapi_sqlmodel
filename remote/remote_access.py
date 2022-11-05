@@ -11,7 +11,8 @@ from database.models import PersonBase, PersonCreate, TeamPostCreate, PlanPeriod
 
 from database.auth_models import Token
 
-SERVER_ADDRESS = 'http://127.0.0.1:8000'
+# SERVER_ADDRESS = 'http://127.0.0.1:8000'
+SERVER_ADDRESS = 'http://hcc-plan-sqlmodel.onrender.com'
 
 
 def login_supervisor(username: str, password: str):
@@ -182,8 +183,8 @@ if __name__ == '__main__':
     #                                           email=EmailStr('chris.coni@funmail.com')), team_id=7, token=disp_token)
     # print(new_actor)
 
-    plan_period = create_new_plan_period(planperiod=PlanPeriodCreate(end=datetime.date(year=2023, month=3, day=15),
-                                                                     team_id=4, notes='wieder eine Periode'),
+    plan_period = create_new_plan_period(planperiod=PlanPeriodCreate(end=datetime.date(year=2023, month=2, day=28),
+                                                                     team_id=3, notes='wieder eine Periode'),
                                          token=Token.parse_obj(disp_token))
     print(plan_period)
 
