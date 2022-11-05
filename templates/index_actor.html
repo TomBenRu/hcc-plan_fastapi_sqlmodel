@@ -9,9 +9,9 @@
         <div class="w3-dropdown-content w3-card-4 w3-bar-block">
             {% for planung__avail_days in plan_periods  %}
                 {% set avail_days = planung__avail_days.avail_days %}
-                {% set text__avail_days = " (keine Eintragungen)" %}
+                {% set text__avail_days = " (leer)" %}
                 {% if avail_days %}
-                    {% set text__avail_days = " (mit Eintragungen)" %}
+                    {% set text__avail_days = " (ausgefüllt)" %}
                 {% endif %}
                 {% set plan_period = planung__avail_days.plan_period %}
                 <a href="#pp-{{ plan_period.start }}" class="w3-bar-item w3-button">{{ plan_period.start.day }}.{{ plan_period.start.month }}.{{ plan_period.start.year }} - {{ plan_period.end.day }}.{{ plan_period.end.month }}.{{ plan_period.end.year }}{{text__avail_days}}</a>
